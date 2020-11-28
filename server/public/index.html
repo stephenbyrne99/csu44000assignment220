@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <title>Assignment 2</title>
+    </head>
+    <body>
+        <div id="app">
+            <h1>Movies Application</h1>
+            <div>
+                <button v-on:click="handleCreateTable">Create Table</button>
+            </div>
+            <div v-if="tableCreatedError">
+                <p>{{tableCreatedErrorMessage}}</p>
+            </div>
+            <div v-if="tableCreated">
+                <p>{{tableCreatedMessage}}</p>
+            </div>
+            <br/>
+            <form @submit.prevent="handleQuery">
+                <label>Movie Name
+                    <input type="text" v-model="queryTitle">
+                </label>
+                <label>Movie year
+                    <input type="text" v-model="queryYear">
+                </label>
+                <button v-on:submit.prevent>Submit</button> 
+            </form>
+            <br/>
+            <div v-if="hasQueryResponse && !queryError">
+                <table border=1>
+                    <tr>
+                        <th>
+                            Movie Name
+                        </th>
+                        <th>
+                            Movie year
+                        </th>
+                        <th>
+                            Release Date
+                        </th>
+                        <th>
+                            Rank
+                        </th>
+                    </tr>
+                    <tr v-for="movie in movies" :key="movie.title">
+                        <td>
+                            {{movie.title}}
+                        </td>
+                        <td>
+                            {{movie.year}}
+                        </td>
+                        <td>
+                            {{movie.release_date}}
+                        </td>
+                        <td>
+                            {{movie.rank}}
+                        </td>
+                </table>
+                <br/>
+            </div>
+            <div v-if="queryError">
+                <p>{{queryErrorMessage}}</p>
+            </div>
+            <div>   
+                <button v-on:click="handleDeleteTable">Delete Table</button>
+            </div>
+            <div v-if="tableDeleted">
+                <p>{{tableDeletedMessage}}</p>
+            </div>
+            <div v-if="tableDeletedError">
+                <p>{{tableDeletedErrorMessage}}</p>
+            </div>
+            
+            
+        </div>
+    </body>
+
+
+    <script>
+        var app = new Vue({
+            el:'#app',
+            data:{
+                movies: [],
+                tableCreatedError: false,
+                tableCreatedErrorMessage: "",
+                tableCreated: false,
+                tableCreatedMessage: "Table Created",
+                queryYear: null,
+                queryTitle: null,
+                queryError: false,
+                queryErrorMessage: "",
+                hasQueryResponse: false,
+                tableDeleted: false,
+                tableDeletedMessage: "Table Deleted",
+                tableDeletedError: false,
+                tableDeletedErrorMessage : "Error deleting table"
+            },
+            methods: {
+                resetErrorsAndSuccessMessages(){
+                    this.hasQueryResponse = false
+                    this.queryError = false
+                    this.tableCreated = false
+                    this.tableCreatedError = false
+                    this.tableDeleted = false
+                    this.tableDeletedError = false
+                     
+                },
+                async handleCreateTable() {
+
+                    this.resetErrorsAndSuccessMessages()
+
+                    const response = await fetch("api/create-database")
+                       
+                    if(response.status >=200 && response.status <=299){
+                        this.tableCreated = true
+                    }else{
+                        const body = await response.json();
+                        this.tableCreatedError = true
+                        this.tableCreatedErrorMessage = body.message
+                        
+                    }
+                    
+                },
+                async handleDeleteTable() {
+                    
+                    this.resetErrorsAndSuccessMessages()
+
+                    const response = await fetch("api/delete-database")
+                       
+                    if(response.status >=200 && response.status <=299){
+                        this.tableDeleted = true
+                    }else{
+                        const body = await response.json();
+                        this.tableDeletedError = true
+                        this.tableDeletedErrorMessage = body.message
+                    }
+                    
+                },
+
+                async handleQuery() {
+
+                    this.resetErrorsAndSuccessMessages()
+
+                    if(!this.queryTitle || !this.queryYear){
+                        this.queryError = true
+                        this.queryErrorMessage = "Please enter a year and title"
+                        console.log('hit error')
+                    }else{
+                        
+                        const response = await fetch(`api/get-movies?title=${this.queryTitle}&year=${this.queryYear}`)
+                        
+                        if(response.status >=200 && response.status <=299){
+                            const body = await response.json();
+                            this.movies = body
+                            if(this.movies.length === 0){
+                                this.hasQueryResponse = false
+                                this.queryError = true
+                                this.queryErrorMessage = "No movies found matching this queryy"
+                            }else{
+                                this.hasQueryResponse = true
+                            }
+
+                            
+                            
+                        }else{
+                            this.queryError = true
+                            this.queryErrorMessage = "There was a problem fetching your query" // change to error sent by response
+                            console.log(response)
+                        }
+                    
+                    }
+                },
+            }
+        })
+    </script
+</html>
