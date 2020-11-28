@@ -159,16 +159,13 @@
                             if(this.movies.length === 0){
                                 this.hasQueryResponse = false
                                 this.queryError = true
-                                this.queryErrorMessage = "No movies found matching this queryy"
+                                this.queryErrorMessage = "No movies found matching this query"
                             }else{
                                 this.hasQueryResponse = true
-                            }
-
-                            
-                            
+                            }  
                         }else{
                             this.queryError = true
-                            this.queryErrorMessage = "There was a problem fetching your query" // change to error sent by response
+                            this.queryErrorMessage  = body.message 
                             console.log(response)
                         }
                     

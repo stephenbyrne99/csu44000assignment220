@@ -128,7 +128,7 @@ app.get('/api/get-movies', async function (req, res) {
     docClient.query(params, function(err, data) {
         if (err) {
             console.log(err)
-            res.status(400).send('Unable to query as error');
+            return res.status(400).json(err);
         } else {
             console.log("Query succeeded.");
             var results = []
@@ -141,7 +141,7 @@ app.get('/api/get-movies', async function (req, res) {
                     "rank": item.rank,
                 })
             });
-            res.status(200).json(results);
+            return res.status(200).json(results);
         }
     });
 })
