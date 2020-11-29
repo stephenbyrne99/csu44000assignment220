@@ -35,9 +35,7 @@ const BUCKET_PARAMS = {
 }
 
 const app = express();
-
-// middle ware
-app.use(express.static('public'));
+app.use(express.static('public')); // serves html page
 
 
 // database config

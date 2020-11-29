@@ -11,3 +11,6 @@ server/node_modules
 # Ignore files related to API keys
 .env
 server/.env
+
+# ec2 files
+.pem

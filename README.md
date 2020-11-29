@@ -1,0 +1,2 @@
+# Csu44000assignment220
+A simple express server that serves a Vue.js client and handles basic requests like creating a table on AWS dynamodb, collects information from an S3 bucket and populates the dynamodb, and to query and delete the table. The project was then hosted on an EC2 instance.
