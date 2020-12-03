@@ -1,9 +1,8 @@
 const dotenv = require("dotenv");
 const express = require('express');
-const fs = require('fs');
-const cors = require('cors');
 const AWS = require("aws-sdk");
 
+// configure .env secrets
 dotenv.config();
 
 
@@ -35,7 +34,7 @@ const BUCKET_PARAMS = {
 }
 
 const app = express();
-app.use(express.static('public')); // serves html page
+app.use(express.static('public')); // serves html page 
 
 
 // database config
@@ -58,6 +57,7 @@ app.get('/api/create-database', async function (req, res) {
             console.log('error:',err)
             return res.status(400).json(err);
         }
+        
         let allMovies = JSON.parse(data.Body)
 
         dynamodb.createTable(TABLE_PARAMS, async function(err, data) {
@@ -69,7 +69,7 @@ app.get('/api/create-database', async function (req, res) {
                 await sleep(5000); // sleep so table has time to create
                 var docClient = new AWS.DynamoDB.DocumentClient();   
                 allMovies.forEach(function (movie) {
-                    
+
                     var params = {
                         TableName: "Movies",
                         Item: {
@@ -79,17 +79,15 @@ app.get('/api/create-database', async function (req, res) {
                             "rank": movie.info.rank
                         }
                     };
-                    
+
                     docClient.put(params, function(err, data) {
-                    if (err) {
-                        console.error("Unable to add movie", movie.title, ". Error JSON:", JSON.stringify(err, null, 2));
-                    } else {
-                        console.log("PutItem succeeded:", movie.title);
-                    }
+                        if (err) {
+                            console.error("Unable to add movie", movie.title, ". Error JSON:", JSON.stringify(err, null, 2));
+                        } else {
+                            console.log("PutItem succeeded:", movie.title);
+                        }
                     });
                 });
-    
-                
                 return res.status(200).send("Created table and populated.")
             }
         });
@@ -99,7 +97,6 @@ app.get('/api/create-database', async function (req, res) {
 
 app.get('/api/get-movies', async function (req, res) {
     const {title, year} = req.query
-
 
     if(!title || !year){
         res.status(400).send('Please provide title AND year');
